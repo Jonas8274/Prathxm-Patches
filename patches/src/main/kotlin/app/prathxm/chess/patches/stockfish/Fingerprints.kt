@@ -1,0 +1,167 @@
+/*
+ * Copyright 2026 PrathxmOp
+ * https://github.com/PrathxmOp/Prathxm-Patches
+ */
+
+package app.prathxm.chess.patches.stockfish
+
+import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.methodCall
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fingerprint 1 – CBViewModelStateImpl.m() (position setter)
+//
+// We match on the setter method in CBViewModelStateImpl that accepts the
+// generic POSITION parameter (erased to Lcom/chess/chessboard/variants/d;)
+// and returns void.
+// ─────────────────────────────────────────────────────────────────────────────
+object PositionSetterFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        if (classDef.type == "Lcom/chess/chessboard/vm/movesinput/CBViewModelStateImpl;") {
+            val positionType = classDef.methods.find { it.name == "getPosition" }?.returnType
+            positionType != null &&
+                method.parameterTypes.size == 1 &&
+                method.parameterTypes[0] == positionType &&
+                method.returnType == "V" &&
+                method.name != "<init>"
+        } else {
+            false
+        }
+    }
+)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fingerprint 2 – CBViewModelStateImpl.a2()  (setMoveArrows)
+//
+// a2(List<HintArrow>) is the setter for the moveArrows observable field.
+// We need its reference to call it from our extension to inject engine arrows.
+// It is tiny (just delegates to yf9.b()) and unique within the class.
+// ─────────────────────────────────────────────────────────────────────────────
+object SetMoveArrowsFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/chessboard/vm/movesinput/CBViewModelStateImpl;",
+    name = "a2",
+    returnType = "V",
+    parameters = listOf("Ljava/util/List;")
+)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fingerprint 3 – CBViewModelStateImpl.getPosition()
+//
+// Used so our extension can read the current board position / state.
+// ─────────────────────────────────────────────────────────────────────────────
+object GetPositionFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/chessboard/vm/movesinput/CBViewModelStateImpl;",
+    name = "getPosition",
+    returnType = "L",  // returns com.chess.chessboard.variants.Position (obfuscated)
+    parameters = emptyList()
+)
+
+// ─────────────────────────────────────────────────────────────────────────────
+object OptionalPaintersCompanionBFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        classDef.type.contains("ChessBoardViewOptionalPainterType") &&
+            method.name == "b" &&
+            method.parameterTypes.size == 7 &&
+            method.parameterTypes[3] == "[Lcom/chess/internal/utils/chessboard/ChessBoardViewOptionalPainterType;"
+    }
+)
+
+object MainApplicationOnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/MainApplication;",
+    name = "onCreate",
+    parameters = listOf(),
+    returnType = "V"
+)
+
+object GameAnalysisPermissionsGetCanCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/entities/GameAnalysisPermissions;",
+    name = "getCanCreate",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisPermissionsGetCanMoveFeedbackFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/entities/GameAnalysisPermissions;",
+    name = "getCanMoveFeedback",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisPermissionsGetCanMoveStrengthFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/entities/GameAnalysisPermissions;",
+    name = "getCanMoveStrength",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisPermissionsGetCanViewAccuracyAndMovesFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/entities/GameAnalysisPermissions;",
+    name = "getCanViewAccuracyAndMoves",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisPermissionsGetCanViewCoachCommentaryFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/entities/GameAnalysisPermissions;",
+    name = "getCanViewCoachCommentary",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisRepositoryGetGameAnalysisFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        classDef.type == "Lcom/chess/gamereview/repository/GameAnalysisRepositoryImpl;" &&
+            method.name == "b" &&
+            method.parameterTypes.size == 7 &&
+            method.parameterTypes[1] == "Ljava/lang/String;"
+    }
+)
+
+object GameReviewV2V0DFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        (classDef.type == "Lcom/chess/gamereview/v2/v0;" || classDef.type == "Lcom/chess/gamereview/v2/u0;") &&
+            (method.name == "D" || method.name == "E") &&
+            method.parameterTypes.size == 2 &&
+            method.parameterTypes[0] == "Lcom/chess/chessboard/variants/d;" &&
+            method.parameterTypes[1] == "Lcom/chess/gamereview/repository/AnalyzedGameData\$AnalyzedPosition\$Eval;" &&
+            method.returnType == "Lcom/chess/gamereview/api/n;"
+    }
+)
+
+object GameReviewV2V0JFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        (classDef.type == "Lcom/chess/gamereview/v2/v0;" || classDef.type == "Lcom/chess/gamereview/v2/u0;") &&
+            (method.name == "J" || method.name == "K") &&
+            method.parameterTypes.size == 4 &&
+            method.parameterTypes[0] == "Lcom/chess/gamereview/repository/AnalyzedGameData\$AnalyzedPosition;" &&
+            method.parameterTypes[1] == "Lcom/chess/chessboard/history/i;" &&
+            method.parameterTypes[2] == "Lcom/chess/entities/GameAnalysisPermissions;" &&
+            method.parameterTypes[3] == "Z" &&
+            method.returnType == "Lcom/chess/gamereview/api/d;"
+    }
+)
+
+object ConnectivityUtilImplIsOfflineFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/utils/android/misc/ConnectivityUtilImpl;",
+    name = "b",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object ConnectivityUtilImplIsOnlineFingerprint : Fingerprint(
+    definingClass = "Lcom/chess/utils/android/misc/ConnectivityUtilImpl;",
+    name = "c",
+    parameters = listOf(),
+    returnType = "Z"
+)
+
+object GameAnalysisServiceImplGetPermissionsFingerprint : Fingerprint(
+    custom = { method, classDef ->
+        classDef.type == "Lcom/chess/net/v1/analysis/GameAnalysisServiceImpl;" &&
+            method.name == "a" &&
+            method.parameterTypes.size == 2 &&
+            method.parameterTypes[0] == "Lcom/chess/entities/CompatGameIdAndType;" &&
+            method.returnType == "Ljava/lang/Object;"
+    }
+)
+
