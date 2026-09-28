@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-09-28T15:38:41",
+  "description": "## [1.14.0-dev.2](https://github.com/PrathxmOp/Prathxm-Patches/compare/v1.14.0-dev.1...v1.14.0-dev.2) (2026-09-28)\n\n### 🐛 Bug Fixes\n\n* **Stockfish:** restore 8-arg getLocalAnalysisFlow and clean up move classification toasts ([d3caa81](https://github.com/PrathxmOp/Prathxm-Patches/commit/d3caa8126b5c0ef6ed781edd4a359a8710f99236))",
+  "download_url": "https://github.com/PrathxmOp/Prathxm-Patches/releases/download/v1.14.0-dev.2/patches-1.14.0-dev.2.mpp",
+  "signature_download_url": "",
+  "version": "1.14.0-dev.2"
+}
