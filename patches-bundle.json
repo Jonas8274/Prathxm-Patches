@@ -1,0 +1,7 @@
+{
+  "created_at": "2026-09-28T16:59:25",
+  "description": "## [1.14.0-dev.3](https://github.com/PrathxmOp/Prathxm-Patches/compare/v1.14.0-dev.2...v1.14.0-dev.3) (2026-09-28)\n\n### ✨ New Features\n\n* **Chess.com:** add offline opening book, win-probability review math, and puzzle sound fixes ([48e47b5](https://github.com/PrathxmOp/Prathxm-Patches/commit/48e47b52ed0e11475e4587e61910030c078df097))",
+  "download_url": "https://github.com/PrathxmOp/Prathxm-Patches/releases/download/v1.14.0-dev.3/patches-1.14.0-dev.3.mpp",
+  "signature_download_url": "",
+  "version": "1.14.0-dev.3"
+}
